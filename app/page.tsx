@@ -20,10 +20,6 @@ export default function Home() {
     cpf: ""
   });
 
-  // useEffect(() => {
-  //   console.log("Iniciando...")
-  // }, [form])
-
   const callPaymentAPI = async (e: any) => {
     try {
       e.preventDefault()
@@ -75,6 +71,8 @@ export default function Home() {
       </form>
 
       <button onClick={seePayments}>Ver cobrancas</button>
+
+      <input type="text" placeholder="CPF para acesso"/>
     </div>
   );
 }
