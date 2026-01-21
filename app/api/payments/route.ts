@@ -1,11 +1,50 @@
+import db from "@/models";
 import { NextResponse } from "next/server";
 
 const ABACATE_KEY = process.env.ABACATE_KEY
 
+async function postPaymentBd(payment_abacate_id: string, payment_abacate_status: string, cpf_user: string) {
+
+    try {
+        if (!payment_abacate_id || !payment_abacate_status || !cpf_user) {
+            // console.log("HERE IS FAILING")
+            return NextResponse.json({ message: "Where r the info!?" })
+        }
+
+        const newPayment = await db.Payments.create({
+            cpf_user, payment_abacate_id, payment_abacate_status
+        })
+
+        return NextResponse.json({ message: "Payment criado com sucesso", status: 201, newPayment })
+
+    } catch (err) {
+        console.error("Error posting to postgres Payments: ", err)
+    }
+}
+
+async function verifyCpfBd(cpf_user: string) {
+    try {
+        const existente = await db.Payments.findOne({ where: { cpf_user } })
+
+        if (existente) return NextResponse.json({ message: "CPF já tem um pagamento", status: 400 }) //adicionar para verificar o status tambem
+
+        return NextResponse.json({ message: "No CPF with Payment" })
+    } catch (err) {
+        console.error("Error to verify cpf: ", err)
+
+    }
+}
+
 export async function POST(req: Request) {
-    // console.log("VIVA"
+
     const { nome, email, telefone, cpf } = await req.json()
-    console.log({ nome, email, telefone, cpf }, process.env.ABACATE_KEY)
+    const existCpf = await verifyCpfBd(cpf)
+    if(existCpf) {
+        return NextResponse.json(
+            { error: "CPF ja tem payment" },
+            { status: 500 }
+        );
+    }
     try {
         const response = await fetch('https://api.abacatepay.com/v1/billing/create', {
             method: 'POST',
@@ -41,7 +80,8 @@ export async function POST(req: Request) {
         if (!response.ok) throw new Error("Falha ao criar pagamento");
 
         const responseData = await response.json()
-        console.log(responseData)
+
+        await postPaymentBd(responseData.data.id, responseData.data.status, cpf)
 
         return NextResponse.json(responseData)
 
@@ -54,8 +94,8 @@ export async function POST(req: Request) {
     }
 }
 
-export async function GET(){
-    try{
+export async function GET() {
+    try {
         const response = await fetch('https://api.abacatepay.com/v1/billing/list', {
             method: 'GET',
             headers: {
@@ -68,7 +108,7 @@ export async function GET(){
 
         return NextResponse.json(responseData)
 
-    }catch(err){
+    } catch (err) {
         console.error("ERROR AO LISTAR: ", err)
         return NextResponse.json(
             { error: "Erro interno no pagamento" },
