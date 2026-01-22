@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     const { nome, email, telefone, cpf } = await req.json()
     const existCpf = await verifyCpfBd(cpf)
-    if(existCpf) {
+    if (existCpf) {
         return NextResponse.json(
             { error: "CPF ja tem payment" },
             { status: 500 }
@@ -96,23 +96,17 @@ export async function POST(req: Request) {
 
 export async function GET() {
     try {
-        const response = await fetch('https://api.abacatepay.com/v1/billing/list', {
-            method: 'GET',
-            headers: {
-                authorization: `Bearer: ${ABACATE_KEY}`
+        const payments = await db.Payments.findAll()
+
+        const filterPayments = payments.map((p) => {
+            return{
+                payment_abacate_id: p.dataValues.payment_abacate_id,
+                payment_abacate_status: p.dataValues.payment_abacate_status
             }
         })
 
-        const responseData = await response.json()
-        console.log(responseData)
-
-        return NextResponse.json(responseData)
-
+        return NextResponse.json({ Payments: filterPayments });
     } catch (err) {
-        console.error("ERROR AO LISTAR: ", err)
-        return NextResponse.json(
-            { error: "Erro interno no pagamento" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Erro ao buscar status" }, { status: 500 });
     }
 }

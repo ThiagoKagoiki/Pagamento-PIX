@@ -13,6 +13,7 @@ export default function Home() {
     cpf: string;
   }
 
+  const [cpfAcesso, setAcessoCpf] = useState("")
   const [form, setForm] = useState<Pagante>({
     nome: "",
     email: "",
@@ -47,7 +48,6 @@ export default function Home() {
       })
     }
   }
-  // console.log(`${process.env.ABACATE_KEY}`)
 
   const seePayments = async (e: any) => {
     e.preventDefault()
@@ -59,6 +59,29 @@ export default function Home() {
     console.log(responseData)
   }
 
+  const loginCpf = async (e: any) => {
+    try {
+      e.preventDefault()
+      const response = await fetch('/api/login', {
+        method: "POST",
+        body: String(cpfAcesso)
+      })
+
+      const responseData = await response.json()
+
+      if (response.ok && responseData.link) {
+        window.location.href = responseData.link;
+      } else {
+        alert("Erro ao gerar link de pagamento: " + (responseData.error || "Erro desconhecido"));
+      }
+
+      return { url: responseData.link }
+    } catch (err) {
+      console.error("ERROR NO LOGIN: ", err)
+    } finally {
+      setAcessoCpf("")
+    }
+  }
 
   return (
     <div>
@@ -71,8 +94,11 @@ export default function Home() {
       </form>
 
       <button onClick={seePayments}>Ver cobrancas</button>
-
-      <input type="text" placeholder="CPF para acesso"/>
+      <hr />
+      <form onSubmit={loginCpf}>
+        <input type="text" placeholder="CPF para acesso" value={cpfAcesso} onChange={(e) => setAcessoCpf(e.target.value)} />
+        <button type="submit">Acessar</button>
+      </form>
     </div>
   );
 }
