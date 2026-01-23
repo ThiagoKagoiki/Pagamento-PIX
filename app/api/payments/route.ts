@@ -38,8 +38,9 @@ async function verifyCpfBd(cpf_user: string) {
 export async function POST(req: Request) {
 
     const { nome, email, telefone, cpf } = await req.json()
+    console.log(cpf)
     const existCpf = await verifyCpfBd(cpf)
-    if (existCpf) {
+    if (!existCpf?.ok) {
         return NextResponse.json(
             { error: "CPF ja tem payment" },
             { status: 500 }
@@ -82,6 +83,7 @@ export async function POST(req: Request) {
         const responseData = await response.json()
 
         await postPaymentBd(responseData.data.id, responseData.data.status, cpf)
+        console.log(responseData)
 
         return NextResponse.json(responseData)
 
@@ -97,11 +99,13 @@ export async function POST(req: Request) {
 export async function GET() {
     try {
         const payments = await db.Payments.findAll()
+        console.log(payments)
 
         const filterPayments = payments.map((p) => {
             return{
                 payment_abacate_id: p.dataValues.payment_abacate_id,
-                payment_abacate_status: p.dataValues.payment_abacate_status
+                payment_abacate_status: p.dataValues.payment_abacate_status,
+
             }
         })
 

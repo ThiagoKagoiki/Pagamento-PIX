@@ -3,8 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
     try {
-        const { searchParams } = new URL(req.url)
-        const cpf = searchParams.get('cpf') //colocar o '?' na url na hora da busca
+        const cpf = req.body;
 
         if (!cpf) return NextResponse.json({ error: "CPF faltante" }, { status: 400 });
         try {
