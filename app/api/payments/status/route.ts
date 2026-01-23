@@ -1,23 +1,29 @@
-import db from "@/models";
-import { NextResponse } from "next/server";
+// import db from "@/models";
+// import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-    try {
-        const cpf = req.body;
+// const ABACATE_KEY = process.env.ABACATE_KEY;
 
-        if (!cpf) return NextResponse.json({ error: "CPF faltante" }, { status: 400 });
-        try {
-            const status = await db.Payments.findOne({
-                attributes: ["payment_abacate_status"],
-                where: { cpf_user: cpf }
-            })
+// export async function GET(req: Request) {
+//     try{
+//         const
+//         const id = await db.Payments.findOne({
+//             where: {
+//                 cpf_user: 
+//             }
+//         })
 
-            return NextResponse.json({ status });
-        } catch (err) {
-            return NextResponse.json({ error: "Erro ao buscar status" }, { status: 500 });
-        }
-    } catch (err) {
-        console.error("Error to verify status: ", err)
+//         const response = await fetch('https://api.abacatepay.com/v1/pixQrCode/check', {
+//             method: 'GET',
+//             headers: {
+//                 authorization: `Bearer: ${ABACATE_KEY}`
+//             }
+//         })
 
-    }
-}
+//         const responseData = await response.json()
+//         console.log(responseData)
+
+//         return NextResponse.json(responseData)
+//     }catch(err){
+//         console.error("Erro ao atualizar status dos pagamentos: ", err)
+//     }
+// }

@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         const responseData = await response.json()
 
         await postPaymentBd(responseData.data.id, responseData.data.status, cpf)
-        console.log(responseData)
+        console.log("_________",responseData)
 
         return NextResponse.json(responseData)
 
