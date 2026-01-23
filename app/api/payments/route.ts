@@ -26,9 +26,7 @@ async function verifyCpfBd(cpf_user: string) {
     try {
         const existente = await db.Payments.findOne({ where: { cpf_user } })
 
-        if (existente) return NextResponse.json({ message: "CPF já tem um pagamento", status: 400 }) //adicionar para verificar o status tambem
-
-        return NextResponse.json({ message: "No CPF with Payment" })
+        return existente
     } catch (err) {
         console.error("Error to verify cpf: ", err)
 
@@ -38,15 +36,14 @@ async function verifyCpfBd(cpf_user: string) {
 export async function POST(req: Request) {
 
     const { nome, email, telefone, cpf } = await req.json()
-    console.log(cpf)
-    const existCpf = await verifyCpfBd(cpf)
-    if (!existCpf?.ok) {
-        return NextResponse.json(
-            { error: "CPF ja tem payment" },
-            { status: 500 }
-        );
-    }
     try {
+        const existCpf = await verifyCpfBd(cpf)
+        if (existCpf) {
+            return NextResponse.json(
+                { error: "CPF ja tem payment"},
+                {status: 400 },
+            );
+        }
         const response = await fetch('https://api.abacatepay.com/v1/billing/create', {
             method: 'POST',
             headers: {
