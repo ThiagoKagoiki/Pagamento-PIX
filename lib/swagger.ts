@@ -70,6 +70,16 @@ export const swaggerOptions = {
                     }
                 }
             },
+            '/api/payments/status': {
+                get: {
+                    tags: ['Payments'],
+                    summary: 'Lista todas os status de todas cobranças do banco de dados',
+                    responses: {
+                        200: { description: 'OK' },
+                        500: { error: 'Erro interno no pagamento' }
+                    }
+                },
+            },
         },
     },
 
