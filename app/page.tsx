@@ -62,12 +62,17 @@ export default function Home() {
   const loginCpf = async (e: any) => {
     try {
       e.preventDefault()
+      if(!cpfAcesso){
+        return alert("Informe um CPF para acesso")
+      }
       const response = await fetch('/api/login', {
         method: "POST",
-        body: String(cpfAcesso)
+        body: JSON.stringify({ cpf_user: String(cpfAcesso) ?? "" })
       })
+      console.log("CPF PARA ACESSO: ", cpfAcesso)
 
       const responseData = await response.json()
+      console.log(responseData)
 
       if (response.ok && responseData.link) {
         window.location.href = responseData.link;
