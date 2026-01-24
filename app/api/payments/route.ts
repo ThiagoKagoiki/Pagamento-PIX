@@ -3,16 +3,16 @@ import { NextResponse } from "next/server";
 
 const ABACATE_KEY = process.env.ABACATE_KEY
 
-async function postPaymentBd(payment_abacate_id: string, payment_abacate_status: string, cpf_user: string) {
+async function postPaymentBd(payment_abacate_id: string, payment_abacate_status: string, cpf_user: string, link_payment: string) {
 
     try {
-        if (!payment_abacate_id || !payment_abacate_status || !cpf_user) {
+        if (!payment_abacate_id || !payment_abacate_status || !cpf_user || !link_payment) {
             // console.log("HERE IS FAILING")
             return NextResponse.json({ message: "Where r the info!?" })
         }
 
         const newPayment = await db.Payments.create({
-            cpf_user, payment_abacate_id, payment_abacate_status
+            cpf_user, payment_abacate_id, payment_abacate_status, link_payment
         })
 
         return NextResponse.json({ message: "Payment criado com sucesso", status: 201, newPayment })
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
                     }
                 ],
                 returnUrl: "http://localhost:3000/",
-                completionUrl: "https://thiagoyukio.com.br/",
+                completionUrl: "http://localhost:3000/approveds",
                 // customerId: "",
                 customer: {
                     name: nome,
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
         const responseData = await response.json()
 
-        await postPaymentBd(responseData.data.id, responseData.data.status, cpf)
+        await postPaymentBd(responseData.data.id, responseData.data.status, cpf,responseData.data.url)
         console.log("_________",responseData)
 
         return NextResponse.json(responseData)

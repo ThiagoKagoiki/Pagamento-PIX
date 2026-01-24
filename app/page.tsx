@@ -14,6 +14,7 @@ export default function Home() {
   }
 
   const [cpfAcesso, setAcessoCpf] = useState("")
+  const [cpfCobrancas, setCpfCobrancas] = useState("")
   const [form, setForm] = useState<Pagante>({
     nome: "",
     email: "",
@@ -88,6 +89,23 @@ export default function Home() {
     }
   }
 
+  const verCobrancaCpf = async (e: any) => {
+    try{
+      e.preventDefault()
+      const response = await fetch('/api/payments/link_payment', {
+        method: 'GET',
+        body: JSON.stringify({ cpf_user: String(cpfCobrancas) ?? ""})
+      })
+
+      const responseData = await response.json()
+      console.log(responseData)
+
+      return { retorno: responseData}
+    }catch(err){
+      console.error("ERRO verCobrancaCpf: ", err)
+    }
+  }
+
   return (
     <div>
       <form onSubmit={callPaymentAPI}>
@@ -102,6 +120,12 @@ export default function Home() {
       <hr />
       <form onSubmit={loginCpf}>
         <input type="text" placeholder="CPF para acesso" value={cpfAcesso} onChange={(e) => setAcessoCpf(e.target.value)} />
+        <button type="submit">Acessar</button>
+      </form>
+
+      <hr />
+      <form onSubmit={verCobrancaCpf}>
+        <input type="text" placeholder="CPF para ver a cobranca" value={cpfCobrancas} onChange={(e) => setCpfCobrancas(e.target.value)} />
         <button type="submit">Acessar</button>
       </form>
     </div>

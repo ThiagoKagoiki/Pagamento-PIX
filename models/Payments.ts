@@ -5,7 +5,8 @@ export default (sequelize: Sequelize) => {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         cpf_user: { type: DataTypes.STRING, allowNull: false, unique: true },
         payment_abacate_id: { type: DataTypes.STRING, allowNull: false, unique: true },
-        payment_abacate_status: { type: DataTypes.STRING, allowNull: false }
+        payment_abacate_status: { type: DataTypes.STRING, allowNull: false },
+        link_payment: { type: DataTypes.STRING, allowNull: false}
     })
 
     return Payments
