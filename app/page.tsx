@@ -3,6 +3,7 @@
 import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Reproved from "./reproveds/page";
 
 export default function Home() {
 
@@ -13,8 +14,18 @@ export default function Home() {
     cpf: string;
   }
 
+  type cpfPendente = {
+    cpf: string
+    message: string,
+    link: string
+  }
+
   const [cpfAcesso, setAcessoCpf] = useState("")
-  const [cpfCobrancas, setCpfCobrancas] = useState("")
+  const [cpfCobrancas, setCpfCobrancas] = useState<cpfPendente>({
+    cpf: "",
+    message: "",
+    link: ""
+  })
   const [form, setForm] = useState<Pagante>({
     nome: "",
     email: "",
@@ -63,7 +74,7 @@ export default function Home() {
   const loginCpf = async (e: any) => {
     try {
       e.preventDefault()
-      if(!cpfAcesso){
+      if (!cpfAcesso) {
         return alert("Informe um CPF para acesso")
       }
       const response = await fetch('/api/login', {
@@ -91,18 +102,22 @@ export default function Home() {
   }
 
   const verCobrancaCpf = async (e: any) => {
-    try{
+    try {
       e.preventDefault()
-      const response = await fetch('/api/payments/link_payment', {
-        method: 'GET',
-        body: JSON.stringify({ cpf_user: String(cpfCobrancas) ?? ""})
+      const response = await fetch(`/api/login?cpf_user=${cpfCobrancas.cpf}`, {
+        method: 'GET'
       })
 
       const responseData = await response.json()
-      console.log(responseData)
-
-      return { retorno: responseData}
-    }catch(err){
+      console.log(responseData.link_payment)
+      setCpfCobrancas({
+        cpf: cpfCobrancas.cpf,
+        link: responseData.link_payment,
+        message: responseData.message
+      })
+      console.log(cpfCobrancas.link)
+      return { retorno: responseData }
+    } catch (err) {
       console.error("ERRO verCobrancaCpf: ", err)
     }
   }
@@ -126,9 +141,21 @@ export default function Home() {
 
       <hr />
       <form onSubmit={verCobrancaCpf}>
-        <input type="text" placeholder="CPF para ver a cobranca" value={cpfCobrancas} onChange={(e) => setCpfCobrancas(e.target.value)} />
+        <input type="text" placeholder="CPF para ver a cobranca" value={cpfCobrancas.cpf} onChange={((e) => setCpfCobrancas({ ...cpfCobrancas, cpf: e.target.value }))} />
         <button type="submit">Acessar</button>
       </form>
+
+      {cpfCobrancas.message && (
+        <div>
+          <h3>
+            CPF: {cpfCobrancas.cpf} / {cpfCobrancas.message}</h3>
+          {cpfCobrancas.link && (
+
+            <p>Link da cobrança: <a href={cpfCobrancas.link}>{cpfCobrancas.link}</a></p>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
