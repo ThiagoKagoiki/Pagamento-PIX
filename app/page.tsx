@@ -79,6 +79,7 @@ export default function Home() {
         window.location.href = responseData.link;
       } else {
         alert("Erro ao gerar link de pagamento: " + (responseData.error || "Erro desconhecido"));
+        window.location.href = responseData.link;
       }
 
       return { url: responseData.link }

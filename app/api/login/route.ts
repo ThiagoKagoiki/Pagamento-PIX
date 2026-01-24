@@ -68,18 +68,19 @@ export async function POST(req: Request) {
         })
 
 
+        
+        if (!findCpf) return NextResponse.json({ message: "Nenhum pagamento nesse CPF", link: 'http://localhost:3000' }, { status: 400 });
+        
         const status = await seeStatusPaymentsById(cpf_user)
         console.log(status)
         if (!status?.ok) {
-            return NextResponse.json({ message: "Pagamento pendente ou expirado" }, { status: 500 })
+            return NextResponse.json({ message: "Pagamento pendente ou expirado", link: 'http://localhost:3000/reproveds' }, { status: 500 })
         }
-
-        if (!findCpf) return NextResponse.json({ message: "Nenhum pagamento nesse CPF", link: 'http://localhost:3000/reproveds' }, { status: 400 });
 
         return NextResponse.json({ message: "Acesso realizado", link: 'http://localhost:3000/approveds' }, { status: 200 });
     } catch (err) {
         console.error("Erro na tentativa de login")
-        return NextResponse.json({ message: "Erro ao tentar logar: " + err, status: 500 })
+        return NextResponse.json({ message: "Erro ao tentar logar: " + err, link: 'http://localhost:3000/'},{ status: 500 })
     }
 }
 
