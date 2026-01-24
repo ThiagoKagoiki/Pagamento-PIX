@@ -68,9 +68,9 @@ export async function POST(req: Request) {
         })
 
 
-        
+
         if (!findCpf) return NextResponse.json({ message: "Nenhum pagamento nesse CPF", link: 'http://localhost:3000' }, { status: 400 });
-        
+
         const status = await seeStatusPaymentsById(cpf_user)
         console.log(status)
         if (!status?.ok) {
@@ -80,25 +80,33 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "Acesso realizado", link: 'http://localhost:3000/approveds' }, { status: 200 });
     } catch (err) {
         console.error("Erro na tentativa de login")
-        return NextResponse.json({ message: "Erro ao tentar logar: " + err, link: 'http://localhost:3000/'},{ status: 500 })
+        return NextResponse.json({ message: "Erro ao tentar logar: " + err, link: 'http://localhost:3000/' }, { status: 500 })
     }
 }
 
 export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url)
+    const cpf_user = searchParams.get("cpf_user")
+
+    if (!cpf_user) {
+        return NextResponse.json(
+            { error: "Informar CPF" },
+            { status: 500 }
+        );
+    }
     try {
-        const cpf = req.body;
+        const response = await db.Payments.findOne({
+            attributes: ["payment_abacate_status", "link_payment"],
+            where: { cpf_user: cpf_user }
+        })
+        const responseData = await response?.toJSON()
 
-        if (!cpf) return NextResponse.json({ error: "CPF faltante" }, { status: 400 });
-        try {
-            const status = await db.Payments.findOne({
-                attributes: ["payment_abacate_status"],
-                where: { cpf_user: cpf }
-            })
-
-            return NextResponse.json({ status });
-        } catch (err) {
-            return NextResponse.json({ error: "Erro ao buscar status" }, { status: 500 });
+        if(responseData.payment_abacate_status == "PAID"){
+            return NextResponse.json({ message: "Nenhuma cobrança pendente" })
         }
+
+        return NextResponse.json({ message: "Cobranca pendente", link_payment: responseData.link_payment });
+
     } catch (err) {
         console.error("Error to verify status: ", err)
 
