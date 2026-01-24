@@ -29,6 +29,13 @@ export const swaggerOptions = {
                         telefone: { type: 'string', example: '48993215632' },
                         cpf: { type: 'string', example: '29072293037' },
                     }
+                },
+                LoginRequest: {
+                    type: 'object',
+                    required: ['cpf'],
+                    properties: {
+                        cpf: { type: 'string', example: '59494093020' }
+                    }
                 }
             }
         },
@@ -53,7 +60,7 @@ export const swaggerOptions = {
                 },
                 post: {
                     tags: ['Payments'],
-                    summary: 'Lista todas as cobranças do banco de dados',
+                    summary: 'Armazena cpf, id, link, status da cobranca',
                     requestBody: {
                         required: true,
                         content: {
@@ -70,16 +77,46 @@ export const swaggerOptions = {
                     }
                 }
             },
-            '/api/payments/status': {
+            '/api/payments/abacate': {
                 get: {
                     tags: ['Payments'],
-                    summary: 'Lista todas os status de todas cobranças do banco de dados',
+                    summary: 'Lista todas as cobrancas do usuario no abacatePay',
                     responses: {
                         200: { description: 'OK' },
                         500: { error: 'Erro interno no pagamento' }
                     }
                 },
             },
+            '/api/login': {
+                post: {
+                    tags: ['Payments'],
+                    summary: 'Faz login com CPF',
+                    requestBody: {
+                        required: true,
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/LoginRequest'
+                                },
+                            },
+                        },
+                    },
+                    responses: {
+                        200: { description: 'OK' },
+                        500: { error: 'Erro interno no pagamento' }
+                    }
+                }
+            },
+            '/api/payments/consulta': {
+                get: {
+                    tags: ['Payments'],
+                    summary: 'Consulta status e link de um payment atraves de um CPF',
+                    responses: {
+                        200: { description: 'OK' },
+                        500: { error: 'Erro interno na consulta' }
+                    }
+                }
+            }
         },
     },
 
