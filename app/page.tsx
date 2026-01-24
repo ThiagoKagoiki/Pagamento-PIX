@@ -104,7 +104,7 @@ export default function Home() {
   const verCobrancaCpf = async (e: any) => {
     try {
       e.preventDefault()
-      const response = await fetch(`/api/login?cpf_user=${cpfCobrancas.cpf}`, {
+      const response = await fetch(`/api/payments/consulta?cpf_user=${cpfCobrancas.cpf}`, {
         method: 'GET'
       })
 
